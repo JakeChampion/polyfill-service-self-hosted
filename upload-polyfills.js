@@ -62,8 +62,8 @@ async function getOrCreatePolyfillKVStore() {
         }
     }())
 
-    env.STORE_ID = stores.data.find(({ name }) => name === 'polyfill-library')?.id
-    if (!env.STORE_ID) {
+    const storeId = stores.data.find(({ name }) => name === 'polyfill-library')?.id
+    if (!storeId) {
         env.STORE_ID = await fetch("https://api.fastly.com/resources/stores/kv", {
             method: 'POST',
             headers: {
@@ -73,7 +73,9 @@ async function getOrCreatePolyfillKVStore() {
             },
             body: '{"name":"polyfill-library"}'
         })
-        env.STORE_ID = (await env.STORE_ID.json()).id
+        env.STORE_ID = (await storeId.json()).id
+    } else {
+        env.STORE_ID = storeId;
     }
 }
 
