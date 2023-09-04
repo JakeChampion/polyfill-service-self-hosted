@@ -45,7 +45,7 @@ async function getFastlyApiKey() {
     zx.verbose = v;
 }
 
-async function getOrCreatePolyfillKVStore() {
+async function getPolyfillKVStore() {
     let stores = await (async function() {
         try {
             let response = await fetch("https://api.fastly.com/resources/stores/kv", {
@@ -62,9 +62,18 @@ async function getOrCreatePolyfillKVStore() {
         }
     }())
 
-    let storeId = stores.data.find(({ name }) => name === 'polyfill-library')?.id
-    if (!storeId) {
-        storeId = await fetch("https://api.fastly.com/resources/stores/kv", {
+    console.log(stores)
+
+    const storeName = 'polyfill-library';
+    let storeId = stores.data.find(({ name }) => name === storeName)?.id
+    return storeId;
+}
+
+async function getOrCreatePolyfillKVStore() {
+    const existingStoreId = await getPolyfillKVStore()
+
+    if (!existingStoreId) {
+        const storeId = await fetch("https://api.fastly.com/resources/stores/kv", {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",
@@ -75,7 +84,7 @@ async function getOrCreatePolyfillKVStore() {
         })
         env.STORE_ID = (await storeId.json()).id
     } else {
-        env.STORE_ID = storeId;
+        env.STORE_ID = existingStoreId;
     }
 }
 
@@ -142,7 +151,34 @@ async function uploadPolyfillsToKVStore() {
     }
 }
 
+async function unsafeDeletePolyfillStore() {
+    const storeId = await getPolyfillKVStore()
+    if (!storeId) {
+        console.log('No store id provided')
+        return
+    }
+
+    const response = await fetch(`https://api.fastly.com/resources/stores/kv/${storeId}?force=true`, {
+            method: 'DELETE',
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                "Fastly-Key": env.FASTLY_API_TOKEN
+            }
+        })
+    if (response.status === 200) {
+        console.log(`Deleted ${storeId}`)
+    } else {
+        console.log(`Did not delete ${storeId}`)
+        // console.log(response)
+    }
+}
+
+
 await getFastlyApiKey()
 await getOrCreatePolyfillKVStore()
 await linkKVStoreToServiceAndActivate()
 await uploadPolyfillsToKVStore()
+
+
+// await unsafeDeletePolyfillStore()
