@@ -166,7 +166,7 @@ async function unsafeDeletePolyfillStore() {
                 "Fastly-Key": env.FASTLY_API_TOKEN
             }
         })
-    if (response.status === 200) {
+    if (response.status == 200) {
         console.log(`Deleted ${storeId}`)
     } else {
         console.log(`Did not delete ${storeId}`)
