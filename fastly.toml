@@ -13,7 +13,7 @@ build = "npm run build"
 
 [setup]
   [setup.config_stores]
-    [setup.config_stores.config]
+    [setup.config_stores.polyfill_config]
       description = "Configuration data"
 
     [setup.config_stores.polyfill_config]
