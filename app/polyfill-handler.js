@@ -84,7 +84,7 @@ async function streamToString(stream) {
 
 async function polyfill(requestURL, c) {
 	if (env("FASTLY_HOSTNAME") !== "localhost") {
-		let config = new ConfigStore('config');
+		let config = new ConfigStore('polyfill_config');
 		const generation = config.get('generation') || '1';
 		let cacheKey = `${generation}:::${requestURL.pathname + requestURL.search}}`;
 		let error = false;

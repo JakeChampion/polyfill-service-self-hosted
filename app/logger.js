@@ -49,7 +49,7 @@ var logger = (function_ = console.log) => {
 };
 
 function shouldLog() {
-	const config = new ConfigStore('config');
+	const config = new ConfigStore('polyfill_config');
 	return config.get('log') === '1';
 }
 export {
