@@ -16,7 +16,6 @@ build = "npm run build"
     [setup.config_stores.polyfill_config]
       description = "Configuration data"
 
-    [setup.config_stores.polyfill_config]
       [setup.config_stores.polyfill_config.items]
         [setup.config_stores.polyfill_config.items.generation]
           value = "1"
