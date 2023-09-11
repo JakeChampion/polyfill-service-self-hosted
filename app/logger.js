@@ -48,9 +48,32 @@ var logger = (function_ = console.log) => {
 	};
 };
 
-function shouldLog() {
+// Persist within a request in order to have same logging sample within a request
+var cachedRandomPercentage;
+
+function getRandomPercentage(){
+	if (typeof cachedRandomPercentage === 'undefined') {
+		cachedRandomPercentage = Math.random() * 100;
+	}
+
+	return cachedRandomPercentage;
+}
+function withinSampleRate(randomPercentage) {
 	const config = new ConfigStore('polyfill_config');
-	return config.get('log') === '1';
+	const sampleRateString = config.get('sample_rate');
+
+	if (!sampleRateString) return true; // no sampling
+
+	const sampleRate = parseInt(sampleRateString, 10); // Sample rate in integer %
+
+	return randomPercentage < sampleRate;
+}
+
+function shouldLog() {
+	const randomPercentage = getRandomPercentage();
+
+	const config = new ConfigStore('polyfill_config');
+	return config.get('log') === '1' && withinSampleRate(randomPercentage);
 }
 export {
 	shouldLog,
